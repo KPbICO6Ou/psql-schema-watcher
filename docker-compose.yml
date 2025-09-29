@@ -5,7 +5,7 @@ volumes:
 
 services:
   postgres:
-    image: postgres:15
+    image: postgres:13
     container_name: psql-tools-db
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-default}
