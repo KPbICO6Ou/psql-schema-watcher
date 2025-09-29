@@ -176,10 +176,10 @@ ORDER BY table_name, grantee, privilege_type;
 
 # Get schema privileges
 psql -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" -d "$PG_DB" -t -c "
-SELECT 'GRANT ' || privilege_type || ' ON SCHEMA ' || schema_name || ' TO ' || grantee || ';'
+SELECT 'GRANT ' || privilege_type || ' ON SCHEMA ' || object_schema || ' TO ' || grantee || ';'
 FROM information_schema.usage_privileges 
 WHERE object_type = 'SCHEMA' AND grantor != grantee
-ORDER BY schema_name, grantee, privilege_type;
+ORDER BY object_schema, grantee, privilege_type;
 " >> "$OUTPUT_FILE" 2>/dev/null || true
 
 # 4. Functions and procedures
