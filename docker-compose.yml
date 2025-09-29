@@ -1,0 +1,25 @@
+version: '3.8'
+
+volumes:
+  postgres_data:
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: psql-tools-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-default}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    ports:
+      - "0.0.0.0:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-default}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
