@@ -164,14 +164,14 @@ def run_hook(payload: str) -> None:
     # Try to run script.sh if it exists
     import os
     import subprocess
-    script_path = "script.sh"
+    script_path = "./script.sh"
     if os.path.exists(script_path):
         try:
             logging.info(f"[HOOK] Running {script_path}...")
             result = subprocess.run([script_path, payload], 
-                                 capture_output=True, 
-                                 text=True, 
-                                 timeout=30)
+                capture_output=True, 
+                text=True, 
+                timeout=30)
             if result.stdout:
                 logging.info(f"[HOOK OUTPUT] {result.stdout}")
             if result.stderr:
