@@ -140,7 +140,7 @@ pg_dump -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" -d "$PG_DB" \
 
 # 2. Users and roles
 log "2. Backing up users and roles..."
-cat >> "$FULL_OUTPUT_FILE" << EOF
+cat >> "$OUTPUT_FILE" << EOF
 
 -- ==============================================
 -- USERS AND ROLES
@@ -158,7 +158,7 @@ ORDER BY rolname;
 
 # 3. Privileges and permissions
 log "3. Backing up privileges and permissions..."
-cat >> "$FULL_OUTPUT_FILE" << EOF
+cat >> "$OUTPUT_FILE" << EOF
 
 -- ==============================================
 -- PRIVILEGES AND PERMISSIONS
@@ -184,7 +184,7 @@ ORDER BY object_schema, grantee, privilege_type;
 
 # 4. Functions and procedures
 log "4. Backing up functions and procedures..."
-cat >> "$FULL_OUTPUT_FILE" << EOF
+cat >> "$OUTPUT_FILE" << EOF
 
 -- ==============================================
 -- FUNCTIONS AND PROCEDURES
@@ -209,7 +209,7 @@ pg_dump -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" -d "$PG_DB" \
 
 # 5. Sequences
 log "5. Backing up sequences..."
-cat >> "$FULL_OUTPUT_FILE" << EOF
+cat >> "$OUTPUT_FILE" << EOF
 
 -- ==============================================
 -- SEQUENCES
@@ -232,7 +232,7 @@ pg_dump -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" -d "$PG_DB" \
 
 # 6. Indexes
 log "6. Backing up indexes..."
-cat >> "$FULL_OUTPUT_FILE" << EOF
+cat >> "$OUTPUT_FILE" << EOF
 
 -- ==============================================
 -- INDEXES
@@ -255,7 +255,7 @@ pg_dump -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" -d "$PG_DB" \
 
 # 7. Triggers
 log "7. Backing up triggers..."
-cat >> "$FULL_OUTPUT_FILE" << EOF
+cat >> "$OUTPUT_FILE" << EOF
 
 -- ==============================================
 -- TRIGGERS
@@ -278,7 +278,7 @@ pg_dump -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" -d "$PG_DB" \
 
 # 8. Views
 log "8. Backing up views..."
-cat >> "$FULL_OUTPUT_FILE" << EOF
+cat >> "$OUTPUT_FILE" << EOF
 
 -- ==============================================
 -- VIEWS
@@ -301,7 +301,7 @@ pg_dump -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" -d "$PG_DB" \
 
 # 9. Extensions
 log "9. Backing up extensions..."
-cat >> "$FULL_OUTPUT_FILE" << EOF
+cat >> "$OUTPUT_FILE" << EOF
 
 -- ==============================================
 -- EXTENSIONS
@@ -318,7 +318,7 @@ ORDER BY extname;
 
 # 10. Database settings and configuration
 log "10. Backing up database settings..."
-cat >> "$FULL_OUTPUT_FILE" << EOF
+cat >> "$OUTPUT_FILE" << EOF
 
 -- ==============================================
 -- DATABASE SETTINGS
