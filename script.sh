@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euxo pipefail
 # PostgreSQL Schema Backup Script
 # Creates a complete schema backup including tables, users, privileges, procedures and functions
 
