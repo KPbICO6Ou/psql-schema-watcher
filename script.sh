@@ -48,80 +48,9 @@ log "Backing up database schema..."
 
 # Check if PostgreSQL clients are available
 if ! command -v pg_dump &> /dev/null; then
-    log "WARNING: pg_dump not found. Creating demo backup structure..."
-    
-    # Create demo backup structure with real SQL
-    cat >> "$OUTPUT_FILE" << EOF
-
--- ==============================================
--- DEMO BACKUP STRUCTURE
--- ==============================================
--- Note: PostgreSQL clients (pg_dump, psql) not installed
--- This is a demo structure showing what would be backed up
-
--- Example tables that would be backed up
-CREATE TABLE IF NOT EXISTS example_table (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(255),
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS posts (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
-    content TEXT,
-    author_id INTEGER REFERENCES users(id),
-    published BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Example indexes
-CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
-CREATE INDEX IF NOT EXISTS idx_posts_author ON posts(author_id);
-CREATE INDEX IF NOT EXISTS idx_posts_published ON posts(published);
-
--- Example functions
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS \$\$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-\$\$ LANGUAGE plpgsql;
-
--- Example triggers
-CREATE TRIGGER update_example_table_updated_at
-    BEFORE UPDATE ON example_table
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
-
--- Example views
-CREATE OR REPLACE VIEW active_users AS
-SELECT id, username, created_at
-FROM users
-WHERE is_active = TRUE;
-
--- Example roles
-CREATE ROLE IF NOT EXISTS app_user;
-CREATE ROLE IF NOT EXISTS app_admin;
-
--- Example grants
-GRANT SELECT, INSERT, UPDATE ON example_table TO app_user;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO app_admin;
-
-EOF
-    log "Demo backup structure created"
-    exit 0
+    log "ERROR: pg_dump not found. Please install PostgreSQL client tools."
+    log "Run: sudo apt install postgresql-client"
+    exit 1
 fi
 
 # 1. Database and schema creation
