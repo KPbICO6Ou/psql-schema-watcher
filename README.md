@@ -1,12 +1,17 @@
-# PostgreSQL Tools
+# PostgreSQL DDL Event Monitor
 
-A collection of PostgreSQL database management tools with DDL event monitoring and Peewee ORM integration.
+A real-time PostgreSQL DDL event monitoring tool that captures database schema changes and triggers custom actions.
 
 **Translations:** [English](README.md) | [Русский](README_RU.md)
 
 ## Features
 
-- **DDL Event Monitoring** with real-time notifications
+- **Real-time DDL Event Monitoring** - Captures CREATE, ALTER, DROP operations
+- **Custom Hook System** - Execute Python scripts or shell commands on events
+- **PostgreSQL Event Triggers** - Uses native PostgreSQL event trigger system
+- **Automatic Cleanup** - Removes triggers and functions on exit
+- **Configurable Monitoring** - Monitor specific schemas and event types
+- **JSON Payload** - Rich event information in JSON format
 
 ## Quick Start
 
@@ -35,7 +40,7 @@ python3 psql-watcher.py --db default
 ## Tool Overview
 
 ### psql-watcher.py
-Real-time DDL event monitoring tool.
+Real-time DDL event monitoring tool with custom hook system.
 
 **Usage:**
 ```bash
@@ -43,10 +48,12 @@ python3 psql-watcher.py --db default
 ```
 
 **Features:**
-- Monitors DDL events (CREATE, ALTER, DROP)
+- Monitors DDL events (CREATE, ALTER, DROP, CREATE INDEX, etc.)
 - Real-time notifications via PostgreSQL NOTIFY
 - Automatic trigger installation and cleanup
 - Configurable schema monitoring
+- Custom hook system for script execution
+- JSON payload with rich event information
 
 ## Configuration
 
@@ -78,6 +85,35 @@ python3 psql-watcher.py --db default
 - CREATE INDEX
 - DROP INDEX
 - And more...
+
+## Custom Hook System
+
+The tool supports custom actions when DDL events occur:
+
+### Python Script Hook
+Create a `script.py` file with a `main(payload)` function:
+```python
+def main(payload):
+    # payload is a JSON string with event details
+    import json
+    data = json.loads(payload)
+    print(f"Event: {data['event']}")
+    print(f"Schema: {data['schema']}")
+    print(f"Object: {data['object']}")
+```
+
+### Shell Script Hook
+Create a `script.sh` file that receives payload as argument:
+```bash
+#!/bin/bash
+echo "DDL Event: $1"
+# Process the JSON payload
+```
+
+The tool will automatically:
+- Try to import and run `script.py` if it exists
+- Try to execute `script.sh` if it exists
+- Log all hook execution results
 
 ## Requirements
 
