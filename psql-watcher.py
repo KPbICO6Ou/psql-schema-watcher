@@ -144,12 +144,45 @@ def run_hook(payload: str) -> None:
     Called for every DDL event. 'payload' is a JSON string.
     Edit this to run your custom logic.
     """
-    print(f"[HOOK TRIGGERED] DDL Event detected!")
-    print(f"[PAYLOAD] {payload}")
-    print("-" * 50)
-    # Run bash script
-    # import subprocess
-    # subprocess.run(["/path/to/your/script.sh", payload])
+    logging.info("[HOOK TRIGGERED] DDL Event detected!")
+    logging.info(f"[PAYLOAD] {payload}")
+    logging.info("-" * 50)
+    
+    # Try to import and run script.py
+    try:
+        import script
+        if hasattr(script, 'main'):
+            logging.info("[HOOK] Running script.py main()...")
+            script.main(payload)
+        else:
+            logging.warning("[HOOK] script.py found but no main() function")
+    except ImportError:
+        logging.info("[HOOK] script.py not found, skipping Python script")
+    except Exception as e:
+        logging.error(f"[HOOK ERROR] Error running script.py: {e}")
+    
+    # Try to run script.sh if it exists
+    import os
+    import subprocess
+    script_path = "script.sh"
+    if os.path.exists(script_path):
+        try:
+            logging.info(f"[HOOK] Running {script_path}...")
+            result = subprocess.run([script_path, payload], 
+                                 capture_output=True, 
+                                 text=True, 
+                                 timeout=30)
+            if result.stdout:
+                logging.info(f"[HOOK OUTPUT] {result.stdout}")
+            if result.stderr:
+                logging.error(f"[HOOK ERROR] {result.stderr}")
+            logging.info(f"[HOOK] {script_path} completed with code {result.returncode}")
+        except subprocess.TimeoutExpired:
+            logging.error(f"[HOOK ERROR] {script_path} timed out after 30 seconds")
+        except Exception as e:
+            logging.error(f"[HOOK ERROR] Error running {script_path}: {e}")
+    else:
+        logging.info(f"[HOOK] {script_path} not found, skipping shell script")
 
 def get_conn(dbname: str):
     conn = psycopg2.connect(
@@ -239,19 +272,19 @@ def main():
     listen_conn = None
 
     try:
-        print("[DEBUG] Connecting to database...")
+        logging.info("[DEBUG] Connecting to database...")
         admin_conn = get_conn(args.db)
-        print("[DEBUG] Connection successful!")
+        logging.info("[DEBUG] Connection successful!")
 
         # Best-effort pre-clean (in case of same names)
-        print("[DEBUG] Removing old triggers...")
+        logging.info("[DEBUG] Removing old triggers...")
         uninstall_ddl(admin_conn, names)
-        print("[DEBUG] Old triggers removed!")
+        logging.info("[DEBUG] Old triggers removed!")
 
         # Install objects
-        print("[DEBUG] Creating new triggers...")
+        logging.info("[DEBUG] Creating new triggers...")
         install_ddl(admin_conn, schemas, args.channel, names)
-        print("[DEBUG] Triggers created!")
+        logging.info("[DEBUG] Triggers created!")
         logging.info("[OK] Installed event triggers & functions")
 
         # Start listening
@@ -263,7 +296,7 @@ def main():
             logging.info("[OK] Sent startup ping")
 
         # Event loop
-        print("[WATCHER] Listening for DDL events...")
+        logging.info("[WATCHER] Listening for DDL events...")
         while not STOP_FLAG:
             r, _, _ = select.select([listen_conn], [], [], 30)
             if not r:
@@ -271,11 +304,11 @@ def main():
             listen_conn.poll()
             while listen_conn.notifies:
                 n = listen_conn.notifies.pop(0)
-                print(f"[WATCHER] Event received on channel: {n.channel}")
+                logging.info(f"[WATCHER] Event received on channel: {n.channel}")
                 try:
                     run_hook(n.payload)
                 except Exception as e:
-                    print(f"[WATCHER ERROR] Hook failed: {e}")
+                    logging.error(f"[WATCHER ERROR] Hook failed: {e}")
 
     except psycopg2.Error as e:
         logging.error(f"[DB ERROR] {e}")
